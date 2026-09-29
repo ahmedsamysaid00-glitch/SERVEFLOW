@@ -1,0 +1,5 @@
+[functions.invite-employee]
+verify_jwt = true
+
+[functions.set-initial-password]
+verify_jwt = false
