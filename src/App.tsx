@@ -104,9 +104,7 @@ if (
 }
 
   // No identity → onboarding
-  if (!membership && !customer) return <Navigate to="/onboarding" replace />;
-
-  // Customer path — membership is null but customer exists
+  // Customer path — any authenticated user without restaurant membership
   if (!membership) {
     return (
       <RequireCustomer>

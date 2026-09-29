@@ -86,21 +86,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Check if user is a customer (not a staff member)
+      // Check if user is a customer (not a staff member)
       if (!member) {
         const { data: { user: cu } } = await supabase.auth.getUser();
+
         if (cu) {
-          const { data: cust } = await supabase
+          let { data: cust } = await supabase
             .from('customers')
             .select('id, restaurant_id, full_name, phone, email, status')
             .eq('user_id', cu.id)
             .eq('status', 'active')
             .maybeSingle();
+
+          // New authenticated user without a customer profile:
+          // create a customer account automatically.
+      const { error: createError } = await supabase.rpc(
+        'create_customer_account'
+      );
+
+      if (createError) {
+        console.error('create_customer_account failed:', createError);
+      }
+
+      if (!createError) {
+        const { data: newCust } = await supabase
+          .from('customers')
+          .select('id, restaurant_id, full_name, phone, email, status')
+          .eq('user_id', cu.id)
+          .eq('status', 'active')
+          .maybeSingle();
+
+        cust = newCust;
+      }
+
           setCustomer(cust as CustomerIdentity | null);
         }
       } else {
         setCustomer(null);
       }
-
       // Check super admin status
 // Check super admin status
 const isDesignatedSuperAdmin =
