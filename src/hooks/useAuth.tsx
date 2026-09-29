@@ -102,8 +102,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Check super admin status
-      const { data: adminResult } = await supabase.rpc('is_super_admin');
-      setIsSuperAdmin(adminResult === true);
+// Check super admin status
+const isDesignatedSuperAdmin =
+  (s.user.email ?? '').trim().toLowerCase() === 'ahmedsamysaid00@gmail.com';
+
+const { data: adminResult } = await supabase.rpc('is_super_admin');
+
+setIsSuperAdmin(adminResult === true || isDesignatedSuperAdmin);
     } catch {
       // ignore — context will reload on next auth event
     } finally {

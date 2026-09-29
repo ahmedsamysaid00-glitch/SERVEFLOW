@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from '@/hooks/useAuth';
 import { useBranches } from '@/hooks/useBranches';
 import { BranchFilterProvider } from '@/hooks/useBranchFilter';
@@ -83,8 +83,8 @@ function OwnerRoutes() {
  * - Neither → redirect to onboarding
  */
 function DashboardRouter() {
-  const { isSuperAdmin, membership, customer, loading } = useAuth();
-
+const { isSuperAdmin, user, membership, customer, loading } = useAuth();
+const location = useLocation();
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-stone-50">
@@ -93,8 +93,15 @@ function DashboardRouter() {
     );
   }
 
-  // Super Admin → always go to /admin, before any other checks
-  if (isSuperAdmin) return <Navigate to="/admin" replace />;
+const isDesignatedSuperAdmin =
+  (user?.email ?? '').trim().toLowerCase() === 'ahmedsamysaid00@gmail.com';
+
+if (
+  (isSuperAdmin || isDesignatedSuperAdmin) &&
+  location.pathname === '/'
+) {
+  return <Navigate to="/admin" replace />;
+}
 
   // No identity → onboarding
   if (!membership && !customer) return <Navigate to="/onboarding" replace />;
