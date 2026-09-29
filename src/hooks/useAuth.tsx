@@ -121,21 +121,32 @@ setIsSuperAdmin(adminResult === true || isDesignatedSuperAdmin);
     await loadContext(data.session);
   }
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      loadContext(data.session);
-    });
+ useEffect(() => {
+  let mounted = true;
+  let initialized = false;
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      (async () => {
-        await loadContext(s);
-      })();
-    });
+  const { data: sub } = supabase.auth.onAuthStateChange((event, s) => {
+    if (event === 'INITIAL_SESSION' && !initialized) {
+      return;
+    }
 
-    return () => {
-      sub.subscription.unsubscribe();
-    };
-  }, []);
+    if (mounted) {
+      void loadContext(s);
+    }
+  });
+
+  supabase.auth.getSession().then(({ data }) => {
+    if (!mounted) return;
+
+    initialized = true;
+    void loadContext(data.session);
+  });
+
+  return () => {
+    mounted = false;
+    sub.subscription.unsubscribe();
+  };
+}, []);
 
   const signUp = async (email: string, password: string, fullName?: string) => {
     const { error } = await supabase.auth.signUp({
