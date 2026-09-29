@@ -208,6 +208,7 @@ export default function App() {
             <Route path="restaurants/:restaurantId/branches/:branchId" element={<RouteMenu />} />
             <Route path="cart" element={<RouteCart />} />
             <Route path="checkout" element={<RouteCheckout />} />
+            <Route path="menu" element={<RouteMenu />} /><Route path="menu" element={<RouteMenu />} />
             <Route path="orders" element={<RouteOrders />} />
             <Route path="orders/:id" element={<RouteOrderDetails />} />
             <Route path="profile" element={<RouteProfile />} />
